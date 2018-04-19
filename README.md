@@ -26,9 +26,10 @@ e.g.
 
 > CREATE PRIMARY INDEX `basquiat-primary-index` ON `basquiat`
     
-## 2. MySql 설치
+## 2. MySql 설정
 
-	
+See https://github.com/basquiat78/middle-web3j/tree/master/x-files
+
 ## 3. Web3J tool 설치
 
 ###	3.1 solc Compiler
@@ -36,20 +37,20 @@ npm을 통해서 받는다.
 	 
 >npm install -g solc
 	  
-해당프로젝트에 관련 툴은   폴더에 있다.
+해당프로젝트에 관련 툴은  https://github.com/basquiat78/middle-web3j/tree/master/sol 폴더에 있다.
 	  
 	  
 ### 3.2 Web3j Command Tool
 See  https://github.com/web3j/web3j/releases
 OS에 맞게 다운로드 하고 압축을 푼다.
-현재 프로젝트에는   폴더에 포함시켜놨다.	
+현재 프로젝트에는 https://github.com/basquiat78/middle-web3j/tree/master/web3j 폴더에 포함시켜놨다.	
 	  
 ## 4. Smart Contract를 사용하기 위한 설정
 token을 생성한 sol파일이 있다면 다음과 같은 방식으로 진행하면 된다.
 현재 프로젝트는 DCToken를 기준으로 작성되었기때문에 다른 토큰을 스마트 컨트랙트로 사용하기 위해서는 코드 수정이 필요하다.
  
 ### 4.1 solidity convert to Java
-이더리움 플랫폼에 token을 생성할때의 sol파일을 프로젝트의 sol 폴더에 저장한다.
+이더리움 플랫폼에 token을 생성할때의 sol파일을 프로젝트의 https://github.com/basquiat78/middle-web3j/tree/master/sol 폴더에 저장한다.
 
 #### 4.1.1. abi와 bin파일 분리하기.
 cmd창에서 해당 sol폴더로 들어간다.
@@ -120,4 +121,4 @@ http://localhost:8090/basquiat/swagger-ui.html#/
 
 ## 9. Web3J 버전
 만일 프라이빗 네트워크에서 생성시 현재 컨트랙트 관련 버그 이슈가 있다.
-이것은    	  
+See https://github.com/basquiat78/middle-web3j/tree/master/extra-jar 	  
