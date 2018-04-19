@@ -121,4 +121,9 @@ http://localhost:8090/basquiat/swagger-ui.html#/
 
 ## 9. Web3J 버전
 만일 프라이빗 네트워크에서 생성시 현재 컨트랙트 관련 버그 이슈가 있다.
-See https://github.com/basquiat78/middle-web3j/tree/master/extra-jar 	  
+See https://github.com/basquiat78/middle-web3j/tree/master/extra-jar
+
+## More..
+
+See https://github.com/web3j/web3j
+
