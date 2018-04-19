@@ -43,7 +43,7 @@ public class AccountServiceTest {
 	
 	@Test
 	public void walletFile() throws Exception {
-		String destinationDirectory = "C:/Users/bsyoon/AppData/Roaming/Ethereum/basquiat/keystore";
+		String destinationDirectory = "C:/Users/basquiat/AppData/Roaming/Ethereum/basquiat/keystore";
 		String fileName = "UTC--2018-04-16T06-11-36.280000000Z--b6c55e745da1f4d6ea4bf49e8c9870d24a302560.json";
 		File destination = new File(destinationDirectory, fileName);
 		WalletFile walletFile = new ObjectMapper().readValue(destination, WalletFile.class);
