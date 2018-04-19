@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.basquiat.app.web3j.service.database.mapper.DatabaseMapper">
+
+	<resultMap id="transactionHistoryVO" type="com.basquiat.app.web3j.observer.vo.TransactionHistoryVO">
+		<id property="transactionHash"		column="transaction_hash"/>
+		<result property="blockHash"		column="block_hash"/>
+		<result property="blockNumber"		column="block_number"/>
+		<result property="fromAddress"		column="from_address"/>
+		<result property="toAddress"		column="to_address"/>
+		<result property="contractAddress"	column="contract_address"/>
+		<result property="value"			column="value"/>
+		<result property="contractValue"	column="contractValue"/>
+		<result property="transactionType"	column="transaction_type"/>
+		<result property="input"			column="input"/>
+		<result property="timeStamp"		column="time_stamp"/>
+		<result property="regDttm"			column="regDttm"/>
+	</resultMap>
+
+	<insert id="createAccount" parameterType="com.basquiat.app.web3j.service.account.vo.AccountVO">
+		<![CDATA[
+			INSERT INTO
+            ICO_USER (
+                   user_id
+                 , eth_address
+                 , regDttm )
+        VALUES
+                 ( #{userId}
+                 , #{createdAddress}
+                 , now()
+                 )   
+		]]>
+	</insert>
+
+	<insert id="backupWalletFile" parameterType="map">
+		<![CDATA[
+			INSERT INTO
+            ICO_WALLET_BACKUP (
+                   user_id
+                 , file_name
+                 , wallet_contents )
+        VALUES
+                 ( #{userId}
+                 , #{walletFileName}
+                 , #{walletContents}
+                 )   
+		]]>
+	</insert>
+
+	<insert id="insertTransaction" parameterType="com.basquiat.app.web3j.observer.vo.TransactionHistoryVO">
+		<![CDATA[
+			INSERT INTO
+            ICO_TRANSACTION (
+                   transaction_hash
+                 , block_hash
+                 , block_number
+                 , from_address
+                 , to_address 
+                 , contract_address
+                 , value
+                 , contractValue
+                 , transaction_type 
+                 , input
+                 , time_stamp
+                 , regDttm 
+                 )
+        VALUES
+                 (
+                  #{transactionHash}
+                 , #{blockHash}
+                 , #{blockNumber}
+                 , #{fromAddress}
+                 , #{toAddress}
+                 , #{contractAddress}
+                 , #{value}
+                 , #{contractValue}
+                 , #{transactionType}
+                 , #{input}
+                 , #{timeStamp}
+                 , now() 
+                 )  
+		]]>
+	</insert>
+
+	<select id="selectTransactionHistoryByUserId" parameterType="string" resultMap="transactionHistoryVO">
+		<![CDATA[
+			SELECT 
+				  IT.block_hash
+				, IT.block_number
+				, IT.from_address
+				, IT.to_address
+				, IT.contract_address
+				, IT.value
+				, IT.contractValue
+				, IT.transaction_type
+				, IT.input
+				, IT.time_stamp
+				, IT.regDttm
+			  FROM ICO_USER IU, ICO_TRANSACTION IT 
+			 WHERE IU.user_id = #{UserId} 
+			   AND (IU.eth_address = IT.from_address OR IU.eth_address = IT.to_address)
+		]]>
+	</select>
+	
+	<select id="checkAccount" parameterType="string" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*) AS cnt 
+					FROM ICO_USER 
+				WHERE user_id = #{userId}
+		]]>
+	</select>
+
+	<select id="getLastBlockNumber" resultType="string">
+		<![CDATA[
+			SELECT block_number 
+					FROM ICO_TRANSACTION 
+				ORDER BY block_number DESC LIMIT 1
+		]]>
+	</select>
+	
+	<select id="selectTransactionHistoryByAddress" parameterType="string" resultMap="transactionHistoryVO">
+		<![CDATA[
+			SELECT
+				  block_hash
+				, block_number
+				, from_address
+				, to_address
+				, contract_address
+				, value
+				, contractValue
+				, transaction_type
+				, input
+				, time_stamp
+				, regDttm
+			  FROM ICO_TRANSACTION IT 
+			 WHERE 1 = 1
+			   AND (from_address = #{address} OR to_address = #{address})
+		]]>
+	</select>
+	
+</mapper>

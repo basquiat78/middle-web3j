@@ -1,0 +1,133 @@
+# Enable http encoding support.
+spring:
+  profiles:
+    active: local
+  http:
+    converters:
+      preferred-json-mapper: jackson
+    encoding:
+      enabled: true
+      charset: UTF-8
+  jackson:
+    default-property-inclusion: NON_NULL
+  mvc:
+    servlet:
+      load-on-startup: 1
+    favicon:
+      enabled: false 
+
+# tomcat
+# was port override set vm option : -Dserver.port=8090
+
+server:
+  context-path: /basquiat
+  compression:
+    enabled: true
+    min-response-size: 1
+  port: 8090
+  tomcat:
+    uri-encoding: UTF-8
+
+# actuator
+management:
+  address: 127.0.0.1
+  port: 8088
+  security:
+    enabled: false
+
+com:
+  basquiat:
+    host: basquiat.com
+
+# console log
+logging:
+  level:
+    com:
+      zaxxer:
+        hikari: INFO
+      basquiat:
+        app: DEBUG
+    org:
+      springframework:
+        web: INFO
+    root: ERROR
+
+# mybatis
+mybatis:
+  mapper-locations: classpath*:mappers/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+---
+#spring profiles : LOCAL
+spring:
+  profiles: local
+  datasource:
+    hikari:
+      cachePrepStmts: true
+      connectionTestQuery: select 1
+      maximumPoolSize: 4
+      minimumIdle: 1
+      prepStmtCacheSize: 250 
+      prepStmtCacheSqlLimit: 2048 
+    url: jdbc:mysql://127.0.0.1:3306/eva?autoReconnect=true
+    username: root
+    password: basquiat
+    dataSourceClassName: com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+    type: com.zaxxer.hikari.HikariDataSource
+    
+#couchbase info    
+couchbase:
+  bucket:
+    name: basquiat
+    password: basquiat
+    ip: localhost
+    expiry: 0    
+    
+#ethereum rpc info
+eth:
+  rpc:
+    protocol: http
+    host: 127.0.0.1
+    port: 8545
+  coinbase:
+    password: testtest
+    path: C:/Users/bsyoon/AppData/Roaming/Ethereum/basquiat/keystore/
+    pathtowallet: C:/Users/bsyoon/AppData/Roaming/Ethereum/basquiat/keystore/UTC--2018-03-28T08-00-30.893714800Z--577005be0cabc7853d304360216b7835c921b7c7    
+  token:
+    address: '0x7608a8b8657d997ed8f19eca481396e9b60b4ae4'
+---
+#spring profiles : STG
+spring:
+  profiles: stg
+  datasource:
+    hikari:
+      cachePrepStmts: true
+      connectionTestQuery: select 1
+      maximumPoolSize: 4
+      minimumIdle: 1
+      prepStmtCacheSize: 250 
+      prepStmtCacheSqlLimit: 2048 
+    url: <<set your database url setting>>
+    username: <<set your database id>>
+    password: <<set your database password>>
+    dataSourceClassName: <<set your database dataSourceName>>
+    type: <<set pool type>>
+    
+#ethereum rpc info
+eth:
+  rpc:
+    protocol: <<your stage rpc protocol>>
+    host: <<your stage rpc host>>
+    port: <<your stage rpc port>>
+  coinbase:
+    password: <<your ethCoinbase account password>>
+    pathtowallet: <<your ethCoinbase path to wallet>>    
+
+#couchbase info    
+couchbase:
+  bucket:
+    name: <<set your bucket name>>
+    password: <<set your bucket password>>
+    ip: <<set your couchbase ip>>
+    expiry: <<set your couchbase expiry>>   
