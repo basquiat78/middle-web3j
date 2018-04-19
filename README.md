@@ -87,7 +87,7 @@ cmd에서 web3j폴더의 bin 폴더로 이동후 web3j.bat를 실행한다.
 
 다음과 같이 명령어를 날린다.
 
-> web3j solidity generate C:\Users\basquiat\Documents\sts\ethereum\eva-web3j\sol\DCToken.bin C:\Users\basquiat\Documents\sts\ethereum\eva-web3j\sol\DCToken.abi -o C:\Users\basquiat\Documents\sts\ethereum\eva-web3j\src\main\java -p com.basquiat.app.ethereum.contract
+> web3j solidity generate C:\Users\basquiat\Documents\sts\ethereum\middle-web3j\sol\DCToken.bin C:\Users\basquiat\Documents\sts\ethereum\middle-web3j\sol\DCToken.abi -o C:\Users\basquiat\Documents\sts\ethereum\middle-web3j\src\main\java -p com.basquiat.app.ethereum.contract
 
 여기서 -o 뒤쪽 명령어중 첫 번째 패쓰는 폴더 위치이며 -p 뒤에 명령어를 변환된 자바 파일이 생성될 패키지를 지정한다.
 
