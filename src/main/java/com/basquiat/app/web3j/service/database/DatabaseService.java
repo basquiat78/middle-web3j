@@ -33,8 +33,8 @@ public interface DatabaseService {
 	
 	public int checkAccount(String userId) throws Exception;
 	
-	public DatabaseBalanceVO selectBalanceByUserId(String userId) throws Exception;
-	public DatabaseBalanceVO selectBalanceByAddress(String address) throws Exception;
+	public DatabaseBalanceVO selectBalanceByUserId(String userId);
+	public DatabaseBalanceVO selectBalanceByAddress(String address);
 	
 	public List<TransactionHistoryVO> selectTransactionHistoryByUserId(String userId);
 	public List<TransactionHistoryVO> selectTransactionHistoryByAddress(String address);

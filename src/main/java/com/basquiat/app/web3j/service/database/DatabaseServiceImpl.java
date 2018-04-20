@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.web3j.crypto.WalletFile;
 import org.web3j.protocol.core.methods.response.Transaction;
 
+import com.basquiat.app.config.exception.ServiceException;
 import com.basquiat.app.web3j.common.util.BasquiatUtils;
 import com.basquiat.app.web3j.common.vo.TransactionType;
 import com.basquiat.app.web3j.observer.vo.ContractDataVO;
@@ -165,8 +166,12 @@ public class DatabaseServiceImpl implements DatabaseService {
  	 * @throws Exception
 	 */
 	@Override
-	public DatabaseBalanceVO selectBalanceByUserId(String userId) throws Exception {
-		return databaseMapper.selectBalanceByUserId(userId);
+	public DatabaseBalanceVO selectBalanceByUserId(String userId) {
+		DatabaseBalanceVO databaseBalanceVO = databaseMapper.selectBalanceByUserId(userId);
+		if(databaseBalanceVO == null) {
+			throw new ServiceException("해당 유저 아이디 정보가 존재하지 않습니다.");
+		}
+		return databaseBalanceVO;
 	}
 
 	/**
@@ -175,8 +180,12 @@ public class DatabaseServiceImpl implements DatabaseService {
  	 * @throws Exception
 	 */
 	@Override
-	public DatabaseBalanceVO selectBalanceByAddress(String address) throws Exception {
-		return databaseMapper.selectBalanceByAddress(address);
+	public DatabaseBalanceVO selectBalanceByAddress(String address) {
+		DatabaseBalanceVO databaseBalanceVO = databaseMapper.selectBalanceByAddress(address);
+		if(databaseBalanceVO == null) {
+			throw new ServiceException("해당 계정 정보가 존재하지 않습니다.");
+		}
+		return databaseBalanceVO;
 	}
 
 	/**
