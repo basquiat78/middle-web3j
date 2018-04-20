@@ -167,7 +167,8 @@ public class BasquiatUtils {
 	 * @return BigDecimal
 	 */
 	public static BigDecimal convertToRealTokenValue(BigInteger amount) {
-		return new BigDecimal(amount.divide(BigInteger.valueOf(100000000)));
+		BigDecimal devideValue = new BigDecimal(100000000);
+		return new BigDecimal(amount).divide(devideValue);
 	}
 	
 }
