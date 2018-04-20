@@ -9,7 +9,6 @@ import org.web3j.crypto.WalletFile;
 import org.web3j.protocol.core.methods.response.Transaction;
 
 import com.basquiat.app.web3j.common.util.BasquiatUtils;
-import com.basquiat.app.web3j.common.util.TransactionMapper;
 import com.basquiat.app.web3j.common.vo.TransactionType;
 import com.basquiat.app.web3j.observer.vo.ContractDataVO;
 import com.basquiat.app.web3j.observer.vo.TransactionHistoryVO;
