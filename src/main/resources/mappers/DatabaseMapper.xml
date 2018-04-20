@@ -18,6 +18,13 @@
 		<result property="regDttm"			column="regDttm"/>
 	</resultMap>
 
+	<resultMap id="databaseBalanceVO" type="kr.doublechain.eva.web3j.service.database.vo.DatabaseBalanceVO">
+		<id property="userId"				column="user_id"/>
+		<result property="accountAddress"	column="account_address"/>
+		<result property="ethBalance"		column="eth_balance"/>
+		<result property="tokenBalance"		column="token_balance"/>
+	</resultMap>
+
 	<insert id="createAccount" parameterType="com.basquiat.app.web3j.service.account.vo.AccountVO">
 		<![CDATA[
 			INSERT INTO
@@ -48,6 +55,21 @@
 		]]>
 	</insert>
 
+	<insert id="initializeBalance" parameterType="map">
+		<![CDATA[
+			INSERT INTO
+            ICO_WALLET_BACKUP (
+                   user_id
+                 , file_name
+                 , wallet_contents )
+        VALUES
+                 ( #{userId}
+                 , #{walletFileName}
+                 , #{walletContents}
+                 )   
+		]]>
+	</insert>
+	
 	<insert id="insertTransaction" parameterType="com.basquiat.app.web3j.observer.vo.TransactionHistoryVO">
 		<![CDATA[
 			INSERT INTO
@@ -82,7 +104,44 @@
                  )  
 		]]>
 	</insert>
+	
+	<select id="selectBalanceByUserId" parameterType="string" resultMap="databaseBalanceVO">
+		<![CDATA[
+			SELECT 
+				  user_id
+				, account_address
+				, eth_balance
+				, token_balance
+			  FROM ICO_BALANCE
+			 WHERE user_id = #{userId} 
+		]]>
+	</select>
 
+	<select id="selectBalanceByAddress" parameterType="string" resultMap="databaseBalanceVO">
+		<![CDATA[
+			SELECT 
+				  user_id
+				, account_address
+				, eth_balance
+				, token_balance
+			  FROM ICO_BALANCE
+			 WHERE account_address = #{address} 
+		]]>
+	</select>
+
+	<update id="updateBalance" parameterType="kr.doublechain.eva.web3j.service.database.vo.DatabaseBalanceVO">
+			Update
+				ICO_BALANCE
+				SET
+				<if test='type == "NORMAL"'>
+					eth_balance = eth_balance + #{ethBalance}
+				</if>
+				<if test='type == "CONTRACT"'>
+					token_balance = token_balance + #{tokenBalance}
+				</if>
+			 WHERE account_address = #{accountAddress} 
+	</update>
+	
 	<select id="selectTransactionHistoryByUserId" parameterType="string" resultMap="transactionHistoryVO">
 		<![CDATA[
 			SELECT 

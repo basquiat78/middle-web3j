@@ -13,10 +13,12 @@ import com.basquiat.app.web3j.common.util.TransactionMapper;
 import com.basquiat.app.web3j.common.vo.TransactionType;
 import com.basquiat.app.web3j.observer.vo.ContractDataVO;
 import com.basquiat.app.web3j.observer.vo.TransactionHistoryVO;
+import com.basquiat.app.web3j.service.account.AccountService;
 import com.basquiat.app.web3j.service.account.vo.AccountVO;
 import com.basquiat.app.web3j.service.block.BlockService;
 import com.basquiat.app.web3j.service.block.vo.ResultBlockVO;
 import com.basquiat.app.web3j.service.database.mapper.DatabaseMapper;
+import com.basquiat.app.web3j.service.database.vo.DatabaseBalanceVO;
 
 /**
  * 
@@ -32,6 +34,9 @@ public class DatabaseServiceImpl implements DatabaseService {
 	private BlockService blockService;
 	
 	@Autowired
+	private AccountService accountService;
+	
+	@Autowired
 	private DatabaseMapper databaseMapper;
 	
 	/**
@@ -41,11 +46,13 @@ public class DatabaseServiceImpl implements DatabaseService {
 	 */
 	@Override
 	public void insertNormalTransaction(Transaction transaction) throws Exception {
-		TransactionHistoryVO transactionHistoryVO = TransactionMapper.mapper.mappingFrom(transaction);
+		TransactionHistoryVO transactionHistoryVO = BasquiatUtils.convertTransactionHistoryVO(transaction);
 		transactionHistoryVO.setTransactionType(TransactionType.NORMAL.name());
 		ResultBlockVO resultBlockVO = blockService.getBlockByNumber(new BigInteger(transactionHistoryVO.getBlockNumber()), true);
 		transactionHistoryVO.setTimeStamp(resultBlockVO.getBlock().getTimestamp());
 		databaseMapper.insertTransaction(transactionHistoryVO);
+		// 해당 계정에 대한 입출금 밸런스를 업데이트한다.
+		this.updateBalance(transactionHistoryVO);
 	}
 	
 	/**
@@ -55,7 +62,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 	 */
 	@Override
 	public void insertContractTransaction(Transaction transaction) throws Exception {
-		TransactionHistoryVO transactionHistoryVO = TransactionMapper.mapper.mappingFrom(transaction);
+		TransactionHistoryVO transactionHistoryVO = BasquiatUtils.convertTransactionHistoryVO(transaction);
 		transactionHistoryVO.setTransactionType(TransactionType.CONTRACT.name());
 		ResultBlockVO resultBlockVO = blockService.getBlockByNumber(new BigInteger(transactionHistoryVO.getBlockNumber()), true);
 		transactionHistoryVO.setTimeStamp(resultBlockVO.getBlock().getTimestamp());
@@ -69,12 +76,14 @@ public class DatabaseServiceImpl implements DatabaseService {
 			transactionHistoryVO.setContractValue(cdVO.getValue());
 		}
 		databaseMapper.insertTransaction(transactionHistoryVO);
+		// 해당 계정에 대한 입출금 밸런스를 업데이트한다.
+		this.updateBalance(transactionHistoryVO);
 	}
 	
 	/**
 	 * 유저 아이디로 트랜잭션 정보 가져오기
 	 * @param UserId
-	 * @return
+	 * @return List<TransactionHistoryVO>
 	 */
 	@Override
 	public List<TransactionHistoryVO> selectTransactionHistoryByUserId(String userId) {
@@ -84,7 +93,7 @@ public class DatabaseServiceImpl implements DatabaseService {
 	/**
 	 * 이더리움 계정으로 트랜잭션 정보 가져오기
 	 * @param address
-	 * @return
+	 * @return List<TransactionHistoryVO>
 	 */
 	@Override
 	public List<TransactionHistoryVO> selectTransactionHistoryByAddress(String address) {
@@ -102,16 +111,21 @@ public class DatabaseServiceImpl implements DatabaseService {
 
 	/**
 	 * account 정보를 인서트한다.
+	 * @param accountVO
+	 * @throws Exception 
 	 */
 	@Override
-	public void createAccount(AccountVO accountVO) {
+	public void createAccount(AccountVO accountVO) throws Exception {
+		// 계정 정보 인서트
 		databaseMapper.createAccount(accountVO);
+		// 계정 밸런스 초기화 설정
+		this.initializeBalance(accountVO);
 	}
 
 	/**
 	 * userId로 생성된 계정이 있는지 체크한
 	 * @param userId
-	 * @return
+	 * @return int
 	 * @throws Exception
 	 */
 	@Override
@@ -120,9 +134,112 @@ public class DatabaseServiceImpl implements DatabaseService {
 		return check;
 	}
 
+	/**
+	 * 신규 계정이 생성되면 해당 walletFile을 db에 백업한다.
+ 	 * @param userId
+ 	 * @param walletFileName
+ 	 * @param walletFile
+ 	 * @throws Exception
+	 */
 	@Override
 	public void backupWalletFile(String userId, String walletFileName, WalletFile walletFile) throws Exception {
 		databaseMapper.backupWalletFile(userId, walletFileName, BasquiatUtils.convertJsonStringFromObject(walletFile));
+	}
+
+	/**
+	 * 계정 생성시에 계정에 대한 밸런스 초기화 정보를 인서트한다.
+	 * @throws Exception
+	 */
+	@Override
+	public void initializeBalance(AccountVO accountVO) throws Exception {
+		DatabaseBalanceVO databaseBalanceVO = new DatabaseBalanceVO();
+		databaseBalanceVO.setUserId(accountVO.getUserId());
+		databaseBalanceVO.setAccountAddress(accountVO.getCreatedAddress());
+		databaseBalanceVO.setEthBalance(BigInteger.ZERO);
+		databaseBalanceVO.setTokenBalance(BigInteger.ZERO);
+		databaseMapper.initializeBalance(databaseBalanceVO);
+	}
+
+	/**
+	 * userId로 해당 계정의 발란스를 가져온다. 
+  	 * @param userId
+ 	 * @throws Exception
+	 */
+	@Override
+	public DatabaseBalanceVO selectBalanceByUserId(String userId) throws Exception {
+		return databaseMapper.selectBalanceByUserId(userId);
+	}
+
+	/**
+	 * address로 해당 계정의 발란스를 가져온다. 
+  	 * @param userId
+ 	 * @throws Exception
+	 */
+	@Override
+	public DatabaseBalanceVO selectBalanceByAddress(String address) throws Exception {
+		return databaseMapper.selectBalanceByAddress(address);
+	}
+
+	/**
+	 * 
+	 * fromAddress에 대한 부분은 주석처리한다.
+	 * 이것은 ICO를 진행할때는 생성된 계정으로 들어온 이더 또는 토큰을 하드 월렛에 옮길 수 있기 때문에
+	 * ICO에 참여한 클라이언트에게 실제 자신이 보낸 이더에 대한 잔액을 보여주기 위해서는 이 부분을 주석처리한다.
+	 * 
+	 * @param transactionHistoryVO
+	 */
+	@Override
+	public void updateBalance(TransactionHistoryVO transactionHistoryVO) {
+		// 이더리움일 경우
+		if(TransactionType.NORMAL.name().equals(transactionHistoryVO.getTransactionType())) {
+			
+			// transactionHistoryVO의 fromAddress가 해당 이더리움 노드에 있는 계정이라면 해당 보낸 값만큼 빼서 balance를 업데이트 한다.
+			if(isExist(transactionHistoryVO.getFromAddress())) {
+//				DatabaseBalanceVO vo = new DatabaseBalanceVO();
+//				vo.setAccountAddress(transactionHistoryVO.getFromAddress());
+//				vo.setEthBalance(new BigInteger(transactionHistoryVO.getValue()).negate());
+//				vo.setType(transactionHistoryVO.getTransactionType());
+//				databaseMapper.updateBalance(vo);		
+			}
+			// transactionHistoryVO의 toAddress가 해당 이더리움 노드에 있는 계정이라면 해당 보낸 값만큼 더해서 balance를 업데이트 한다.
+			if(isExist(transactionHistoryVO.getToAddress())) {
+				DatabaseBalanceVO vo = new DatabaseBalanceVO();
+				vo.setAccountAddress(transactionHistoryVO.getToAddress());
+				vo.setEthBalance(new BigInteger(transactionHistoryVO.getValue()));
+				vo.setType(transactionHistoryVO.getTransactionType());
+				databaseMapper.updateBalance(vo);		
+			}
+			
+		// 토큰일 경우에는	
+		} else {
+			// transactionHistoryVO의 fromAddress가 해당 이더리움 노드에 있는 계정이라면 해당 보낸 값만큼 빼서 balance를 업데이트 한다.
+			if(isExist(transactionHistoryVO.getFromAddress())) {
+//				DatabaseBalanceVO vo = new DatabaseBalanceVO();
+//				vo.setAccountAddress(transactionHistoryVO.getFromAddress());
+//				vo.setTokenBalance(new BigInteger(transactionHistoryVO.getContractValue()).negate());
+//				vo.setType(transactionHistoryVO.getTransactionType());
+//				databaseMapper.updateBalance(vo);		
+			}
+			// transactionHistoryVO의 toAddress가 해당 이더리움 노드에 있는 계정이라면 해당 보낸 값만큼 더해서 balance를 업데이트 한다.
+			if(isExist(transactionHistoryVO.getToAddress())) {
+				DatabaseBalanceVO vo = new DatabaseBalanceVO();
+				vo.setAccountAddress(transactionHistoryVO.getToAddress());
+				vo.setTokenBalance(new BigInteger(transactionHistoryVO.getContractValue()));
+				vo.setType(transactionHistoryVO.getTransactionType());
+				databaseMapper.updateBalance(vo);		
+			}
+		}
+		
+	}
+	
+	/**
+	 * 해당 계정이 노드에 존재하는지 체크하는 로직
+	 * @param address
+	 * @return boolean
+	 */
+	private boolean isExist(String address) {
+		List<String> list = accountService.getEthAccounts().getAccounts();
+		return list.stream().anyMatch(s -> s.equals(address) );
 	}
 	
 }
