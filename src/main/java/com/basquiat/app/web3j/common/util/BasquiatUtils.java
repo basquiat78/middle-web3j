@@ -1,11 +1,14 @@
 package com.basquiat.app.web3j.common.util;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import org.web3j.crypto.WalletFile;
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
 import org.web3j.protocol.core.methods.response.Transaction;
+import org.web3j.utils.Convert;
+import org.web3j.utils.Convert.Unit;
 
 import com.basquiat.app.web3j.observer.vo.ContractDataVO;
 import com.basquiat.app.web3j.observer.vo.TransactionHistoryVO;
@@ -148,4 +151,23 @@ public class BasquiatUtils {
 		WalletFile walletFile = mapper.readValue(destination, WalletFile.class);
 		return walletFile;
 	}
+	
+	/**
+	 * Wei 단위로 저장된 value값을 실제 이더 단위로 변환한다.
+	 * @param amount
+	 * @return BigDecimal
+	 */
+	public static BigDecimal convertToEtherFromWei(BigInteger amount) {
+		return Convert.fromWei(amount.toString(), Unit.ETHER);
+	}
+	
+	/**
+	 * 실제 토큰 발란스로 변환한다.
+	 * @param amount
+	 * @return BigDecimal
+	 */
+	public static BigDecimal convertToRealTokenValue(BigInteger amount) {
+		return new BigDecimal(amount.divide(BigInteger.valueOf(100000000)));
+	}
+	
 }
