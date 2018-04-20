@@ -4,8 +4,8 @@ SET SESSION FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS ICO_TRANSACTION;
 DROP TABLE IF EXISTS ICO_USER;
+DROP TABLE IF EXISTS ICO_BALANCE;
 DROP TABLE IF EXISTS ICO_WALLET_BACKUP;
-
 
 
 /* Create Tables */
@@ -52,6 +52,18 @@ CREATE TABLE ICO_USER
 	regDttm date NOT NULL COMMENT 'regDttm',
 	PRIMARY KEY (id)
 ) COMMENT = 'USER' DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+-- BALANCE
+CREATE TABLE ICO_BALANCE
+(
+	-- user_id
+	user_id varchar(300) NOT NULL COMMENT 'user_id : user_id',
+	-- eth_address
+	account_address varchar(300) NOT NULL COMMENT 'account_address : account_address',
+	eth_balance decimal(65,0) COMMENT 'eth_balance : eth_balance',
+	token_balance decimal(65,0) COMMENT 'token_balance : token_balance',
+	PRIMARY KEY (user_id)
+) COMMENT = 'BALANCE' DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 -- Wallet Backup
 CREATE TABLE ICO_WALLET_BACKUP
