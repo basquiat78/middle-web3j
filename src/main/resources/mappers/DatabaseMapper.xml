@@ -18,7 +18,7 @@
 		<result property="regDttm"			column="regDttm"/>
 	</resultMap>
 
-	<resultMap id="databaseBalanceVO" type="kr.doublechain.eva.web3j.service.database.vo.DatabaseBalanceVO">
+	<resultMap id="databaseBalanceVO" type="com.basquiat.app.web3j.observer.vo.DatabaseBalanceVO">
 		<id property="userId"				column="user_id"/>
 		<result property="accountAddress"	column="account_address"/>
 		<result property="ethBalance"		column="eth_balance"/>
@@ -129,7 +129,7 @@
 		]]>
 	</select>
 
-	<update id="updateBalance" parameterType="kr.doublechain.eva.web3j.service.database.vo.DatabaseBalanceVO">
+	<update id="updateBalance" parameterType="com.basquiat.app.web3j.observer.vo.DatabaseBalanceVO">
 			Update
 				ICO_BALANCE
 				SET
