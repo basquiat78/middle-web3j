@@ -55,18 +55,22 @@
 		]]>
 	</insert>
 
-	<insert id="initializeBalance" parameterType="map">
+	<insert id="initializeBalance" parameterType="com.basquiat.app.web3j.observer.vo.DatabaseBalanceVO">
 		<![CDATA[
 			INSERT INTO
-            ICO_WALLET_BACKUP (
+            ICO_BALANCE (
                    user_id
-                 , file_name
-                 , wallet_contents )
-        VALUES
-                 ( #{userId}
-                 , #{walletFileName}
-                 , #{walletContents}
-                 )   
+                 , account_address
+                 , eth_balance
+                 , token_balance
+                 )
+        	VALUES
+                 (
+                  #{userId}
+                 , #{accountAddress}
+                 , #{ethBalance}
+                 , #{tokenBalance}
+                 )  
 		]]>
 	</insert>
 	
