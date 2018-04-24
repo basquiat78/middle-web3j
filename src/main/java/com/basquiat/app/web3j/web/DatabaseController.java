@@ -12,6 +12,7 @@ import com.basquiat.app.web3j.common.util.BasquiatConstants;
 import com.basquiat.app.web3j.common.vo.BasquiatResponseVO;
 import com.basquiat.app.web3j.observer.vo.TransactionHistoryVO;
 import com.basquiat.app.web3j.service.database.DatabaseService;
+import com.basquiat.app.web3j.service.database.vo.DatabaseBalanceVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,4 +37,16 @@ public class DatabaseController {
     	return new BasquiatResponseVO<List<TransactionHistoryVO>>(databaseService.selectTransactionHistoryByAddress(address));
     }
 
+    @ApiOperation(value = "database balance information", notes = "유저 아이디로 해당 발란스를 가져온다. ")	
+    @GetMapping("/balances/users/{userId}")
+	public BasquiatResponseVO<DatabaseBalanceVO> getBalanceByUserId(@PathVariable String userId){
+    	return new BasquiatResponseVO<DatabaseBalanceVO>(databaseService.selectBalanceByUserId(userId));
+    }
+    
+    @ApiOperation(value = "database balance information", notes = "Ethereum Account로 해당 발란스를 가져온다. ")	
+    @GetMapping("/balances/addresses/{address}")
+	public BasquiatResponseVO<DatabaseBalanceVO> getBalanceByAddress(@PathVariable String address){
+    	return new BasquiatResponseVO<DatabaseBalanceVO>(databaseService.selectBalanceByAddress(address));
+    }
+    
 }
